@@ -10,6 +10,7 @@ namespace EasySwoole\EasySwoole;
 
 
 use App\Console\Test1;
+use App\Process\ApolloSync;
 use App\Process\HotReload;
 use App\Process\TestJob;
 use App\Service\CarService;
@@ -45,6 +46,7 @@ class EasySwooleEvent implements Event
     {
         // TODO: Implement initialize() method.
         date_default_timezone_set('Asia/Shanghai');
+
         //mysql
         $configData = Config::getInstance()->getConf('MYSQL');
         $config = new \EasySwoole\Mysqli\Config($configData);
@@ -52,15 +54,15 @@ class EasySwooleEvent implements Event
         $poolConf->setMaxObjectNum(20);
 
         //redis
-        $redisConfigData = Config::getInstance()->getConf('REDIS');
-        $redisConfig = new \EasySwoole\RedisPool\Config($redisConfigData);
-        // $config->setOptions(['serialize'=>true]);
-        /**
-        这里注册的名字叫redis，你可以注册多个，比如redis2,redis3
-         */
-        $poolConf = \EasySwoole\RedisPool\Redis::getInstance()->register('redis',$redisConfig);
-        $poolConf->setMaxObjectNum($redisConfigData['maxObjectNum']);
-        $poolConf->setMinObjectNum($redisConfigData['minObjectNum']);
+//        $redisConfigData = Config::getInstance()->getConf('REDIS');
+//        $redisConfig = new \EasySwoole\RedisPool\Config($redisConfigData);
+//        // $config->setOptions(['serialize'=>true]);
+//        /**
+//        这里注册的名字叫redis，你可以注册多个，比如redis2,redis3
+//         */
+//        $poolConf = \EasySwoole\RedisPool\Redis::getInstance()->register('redis',$redisConfig);
+//        $poolConf->setMaxObjectNum($redisConfigData['maxObjectNum']);
+//        $poolConf->setMinObjectNum($redisConfigData['minObjectNum']);
 
         //注册事件
         \App\Event\Event::getInstance()->set('test', function () {
@@ -73,12 +75,15 @@ class EasySwooleEvent implements Event
         //注册进程
         $swooleServer = ServerManager::getInstance()->getSwooleServer();
         $swooleServer->addProcess((new HotReload('HotReload', ['disableInotify' => false]))->getProcess());
+        //监听配置文件变更
+        $swooleServer->addProcess((new ApolloSync())->getProcess());
 //        $swooleServer->addProcess((new TestJob())->getProcess());
 
 
         //主服务注册onWorkerStart事件
         $register->add($register::onWorkerStart,function (\swoole_server $server,int $workerId){
             var_dump($workerId.'start');
+            file_put_contents('/tmp/123.log', print_r(get_included_files(),1));
         });
 
         //主服务增加onMessage事件
@@ -253,9 +258,10 @@ class EasySwooleEvent implements Event
         AtomicLimit::getInstance()->enableProcessAutoRestore(ServerManager::getInstance()->getSwooleServer(),10*1000);
 
         //rpc
+        $serverIp = Config::getInstance()->getConf('MAIN_SERVER.LISTEN_ADDRESS');
+
         $config = new \EasySwoole\Rpc\Config();
-//        $config->setServerIp('127.0.0.1');//注册提供rpc服务的ip
-        $config->setServerIp('127.0.0.1');//注册提供rpc服务的ip
+        $config->setServerIp($serverIp);//注册提供rpc服务的ip
         $config->setNodeManager(new RedisManager('127.0.0.1'));//注册节点管理器
 //        $config->getBroadcastConfig()->setEnableBroadcast(true);//启用广播
 //        $config->getBroadcastConfig()->setEnableListen(true);   //启用监听

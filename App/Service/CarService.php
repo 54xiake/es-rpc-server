@@ -27,7 +27,9 @@ class CarService extends AbstractService
     public function getCarInfo() {
         $this->response()->setResult([
             'name'=>'宝马X5',
-            'brand'=>'宝马'
+            'brand'=>'宝马',
+            'price'=>'30',
+            'color'=>'white'
         ]);
     }
 }
