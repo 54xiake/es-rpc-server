@@ -10,8 +10,10 @@ namespace App\Process;
 
 
 use EasySwoole\Component\Process\AbstractProcess;
+use EasySwoole\EasySwoole\Config;
 use EasySwoole\EasySwoole\Core;
 use EasySwoole\EasySwoole\ServerManager;
+use EasySwoole\Utility\File;
 use Swoole\Timer;
 
 class ApolloSync extends AbstractProcess
@@ -21,16 +23,16 @@ class ApolloSync extends AbstractProcess
     {
         if (Core::getInstance()->isDev()) {
             $metaServer = 'http://127.0.0.1:8080';
-            $saveFile = RUNNING_ROOT.'/dev.php';
+            $saveFile = RUNNING_ROOT . '/dev.php';
         } else {
             $metaServer = 'http://127.0.0.1:8080';
-            $saveFile = RUNNING_ROOT.'/produce.php';
+            $saveFile = RUNNING_ROOT . '/produce.php';
         }
 
         $server = new \EasySwoole\Apollo\Server([
-            'server'=>$metaServer,
-            'appId'=>'es-rpc-server',
-            'cluster'=>'default'
+            'server' => $metaServer,
+            'appId' => 'es-rpc-server',
+            'cluster' => 'default'
         ]);
         //创建apollo客户端
         $apollo = new \EasySwoole\Apollo\Apollo($server);
@@ -39,19 +41,21 @@ class ApolloSync extends AbstractProcess
             $result = $apollo->sync('application');
             if ($result->isModify()) {
                 $data = $result->getConfigurations();
-                if(is_array($data)) {
-                    foreach($data as $k=>$v) {
-                        if ($v=='null') {
+                if (is_array($data)) {
+                    foreach ($data as $k => $v) {
+                        if ($v == 'null') {
                             $data[$k] = null;
-                        }elseif (is_array(json_decode($v, true))) {
-                            $data[$k] = json_decode($v,1);
+                        } elseif (is_array(json_decode($v, true))) {
+                            $data[$k] = json_decode($v, 1);
                         }
                     }
 
                 }
-                $content = '<?php return '.var_export($data, true).';';
+                $content = '<?php return ' . var_export($data, true) . ';';
                 file_put_contents($saveFile, $content);
-                ServerManager::getInstance()->getSwooleServer()->reload();
+                //重新加载配置信息
+                $Conf = Config::getInstance();
+                $Conf->load((array)$data);
             }
         });
     }

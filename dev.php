@@ -1,5 +1,5 @@
 <?php return array (
-  'ABC' => 'AAAAA',
+  'abc' => 'abcabcabc',
   'MYSQL' => 
   array (
     'host' => '127.0.0.1',

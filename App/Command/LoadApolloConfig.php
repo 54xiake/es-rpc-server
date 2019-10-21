@@ -16,7 +16,7 @@ class LoadApolloConfig implements CommandInterface
     public function exec(array $args): ?string
     {
 //        getenv();
-        //启动前调用协和
+        //启动前调用协程
         $scheduler = new Scheduler();
         $scheduler->add(function() use($args) {
             if (!isset($args[1]) || $args[1]=='dev') {
