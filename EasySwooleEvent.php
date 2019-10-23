@@ -30,7 +30,7 @@ use EasySwoole\FastCache\CacheProcessConfig;
 use EasySwoole\FastCache\SyncData;
 use EasySwoole\Http\Request;
 use EasySwoole\Http\Response;
-use EasySwoole\Rpc\NodeManager\RedisManager;
+use App\NodeManager\RedisManager;
 use EasySwoole\Rpc\Rpc;
 use EasySwoole\Rpc\Test\NodeService;
 use EasySwoole\Rpc\Test\OrderService;
@@ -46,6 +46,14 @@ class EasySwooleEvent implements Event
     {
         // TODO: Implement initialize() method.
         date_default_timezone_set('Asia/Shanghai');
+
+        //加载公共配置信息
+        $commonFile = RUNNING_ROOT.'/common.php';
+        if (file_exists($commonFile)) {
+            $conf = Config::getInstance();
+            $conf->loadFile($commonFile);
+        }
+
 
         //mysql
         $configData = Config::getInstance()->getConf('MYSQL');
@@ -77,7 +85,6 @@ class EasySwooleEvent implements Event
         $swooleServer->addProcess((new HotReload('HotReload', ['disableInotify' => false]))->getProcess());
         //监听配置文件变更
         $swooleServer->addProcess((new ApolloSync())->getProcess());
-//        $swooleServer->addProcess((new TestJob())->getProcess());
 
 
         //主服务注册onWorkerStart事件
@@ -262,10 +269,13 @@ class EasySwooleEvent implements Event
 
         $config = new \EasySwoole\Rpc\Config();
         $config->setServerIp($serverIp);//注册提供rpc服务的ip
-        $config->setNodeManager(new RedisManager('127.0.0.1'));//注册节点管理器
+        $redisConfig = Config::getInstance()->getConf('REDIS');
+        $nodeManager = new RedisManager($redisConfig['host'], $redisConfig['port'], $redisConfig['auth']);
+        $config->setNodeManager($nodeManager);//注册节点管理器
 //        $config->getBroadcastConfig()->setEnableBroadcast(true);//启用广播
 //        $config->getBroadcastConfig()->setEnableListen(true);   //启用监听
 //        $config->getBroadcastConfig()->setSecretKey('lucky');        //设置秘钥
+        $config->setWorkerNum(4);
 
         $rpc = Rpc::getInstance($config);;
         $rpc->add(new UserService());  //注册服务
@@ -291,19 +301,19 @@ class EasySwooleEvent implements Event
 
     public static function onRequest(Request $request, Response $response): bool
     {
-        if(isset($request->get['api'])){
-            if(AtomicLimit::isAllow('api')){
-                $response->write('api success');
-            }else{
-                $response->write('api refuse');
-            }
-        }else{
+//        if(isset($request->get['api'])){
+//            if(AtomicLimit::isAllow('api')){
+//                $response->write('api success');
+//            }else{
+//                $response->write('api refuse');
+//            }
+//        }else{
 //            if(AtomicLimit::isAllow('default')){
 //                $response->write('default success');
 //            }else{
 //                $response->write('default refuse');
 //            }
-        }
+//        }
         // TODO: Implement onRequest() method.
         return true;
     }

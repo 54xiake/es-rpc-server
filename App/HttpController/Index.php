@@ -36,8 +36,13 @@ class Index extends Controller
 
     function index()
     {
+        $this->request()->getRequestParam();
         // TODO: Implement index() method.
         $this->response()->write('hello world');
+    }
+
+    function rpc() {
+        return ['title'=>'abc'];
     }
 
     function test()
@@ -373,6 +378,20 @@ class Index extends Controller
 
     function config() {
         $config = \EasySwoole\EasySwoole\Config::getInstance()->getConf();
+
+        $this->response()->write(json_encode($config));
+    }
+
+    function common() {
+        $config = \EasySwoole\EasySwoole\Config::getInstance()->getConf('common');
+        var_dump($config);
+
+        $this->response()->write(json_encode($config));
+    }
+
+    function dynamic() {
+        $config = \EasySwoole\EasySwoole\Config::getInstance()->getConf('dynamic');
+        var_dump($config);
 
         $this->response()->write(json_encode($config));
     }

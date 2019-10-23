@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  php:
+    image: 54xiake/es-php71:v1.0.1
+    ports:
+      - "9501:9501"
+    volumes:
+      - ~/myweb/swoole/demo:/var/www/html:rw
+      - ~/MyServer/php/php.ini:/usr/local/etc/php/php.ini:ro
+      - ~/MyServer/php/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+      - ~/MyServer/php/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
+    networks:
+      - lnmp
+    container_name: php71
+    tty: true
+    privileged: true
+    command: php /var/www/html/easyswoole start d&
+
+networks:
+  lnmp:
+    driver: bridge
