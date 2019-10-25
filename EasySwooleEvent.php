@@ -9,7 +9,6 @@
 namespace EasySwoole\EasySwoole;
 
 
-use App\Console\Test1;
 use App\Process\ApolloSync;
 use App\Process\HotReload;
 use App\Process\TestJob;
