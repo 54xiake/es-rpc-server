@@ -56,10 +56,10 @@ class EasySwooleEvent implements Event
 
 
         //mysql
-        $configData = Config::getInstance()->getConf('MYSQL');
-        $config = new \EasySwoole\Mysqli\Config($configData);
-        $poolConf = \EasySwoole\MysqliPool\Mysql::getInstance()->register('mysql', $config);
-        $poolConf->setMaxObjectNum(20);
+//        $configData = Config::getInstance()->getConf('MYSQL');
+//        $config = new \EasySwoole\Mysqli\Config($configData);
+//        $poolConf = \EasySwoole\MysqliPool\Mysql::getInstance()->register('mysql', $config);
+//        $poolConf->setMaxObjectNum(20);
 
         //redis
 //        $redisConfigData = Config::getInstance()->getConf('REDIS');
