@@ -30,6 +30,7 @@ use EasySwoole\Http\AbstractInterface\Controller;
 use EasySwoole\Template\Render;
 use EasySwoole\Validate\Validate;
 use Exception;
+use Xkcms\String\Lunar;
 
 class Index extends Controller
 {
@@ -408,6 +409,12 @@ class Index extends Controller
             'minObjectNum'         => 5,//最小创建数量 最小创建数量不能大于等于最大创建
         ];
         $this->response()->write(json_encode($redis));
+    }
+
+    function lunar() {
+        $lunar = new Lunar();
+        $res = $lunar->convertSolarToLunar('2019', '10', '16');
+        $this->writeJson(1, $res);
     }
 
 }

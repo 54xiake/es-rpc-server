@@ -29,7 +29,9 @@ use EasySwoole\FastCache\CacheProcessConfig;
 use EasySwoole\FastCache\SyncData;
 use EasySwoole\Http\Request;
 use EasySwoole\Http\Response;
-use App\NodeManager\RedisManager;
+use EasySwoole\Redis\Config\RedisConfig;
+use EasySwoole\RedisPool\RedisPool;
+use EasySwoole\Rpc\NodeManager\RedisManager;
 use EasySwoole\Rpc\Rpc;
 use EasySwoole\Rpc\Test\NodeService;
 use EasySwoole\Rpc\Test\OrderService;
@@ -268,8 +270,10 @@ class EasySwooleEvent implements Event
 
         $config = new \EasySwoole\Rpc\Config();
         $config->setServerIp($serverIp);//注册提供rpc服务的ip
-        $redisConfig = Config::getInstance()->getConf('REDIS');
-        $nodeManager = new RedisManager($redisConfig['host'], $redisConfig['port'], $redisConfig['auth']);
+        $redisConfigData = Config::getInstance()->getConf('REDIS');
+        $redisConfig = new RedisConfig($redisConfigData);
+        $redisPool = new RedisPool($redisConfig);
+        $nodeManager = new RedisManager($redisPool);
         $config->setNodeManager($nodeManager);//注册节点管理器
 //        $config->getBroadcastConfig()->setEnableBroadcast(true);//启用广播
 //        $config->getBroadcastConfig()->setEnableListen(true);   //启用监听
@@ -296,6 +300,20 @@ class EasySwooleEvent implements Event
 //        while($ret = \Swoole\Process::wait()) {
 //            echo "PID={$ret['pid']}\n";
 //        }
+
+        $config = new \EasySwoole\ORM\Db\Config();
+        $config->setDatabase('easyswoole');
+        $config->setUser('root');
+        $config->setPassword('asdfghjkl');
+        $config->setHost('127.0.0.1');
+        //连接池配置
+        $config->setGetObjectTimeout(3.0); //设置获取连接池对象超时时间
+        $config->setIntervalCheckTime(30*1000); //设置检测连接存活执行回收和创建的周期
+        $config->setMaxIdleTime(15); //连接池对象最大闲置时间(秒)
+        $config->setMaxObjectNum(20); //设置最大连接池存在连接对象数量
+        $config->setMinObjectNum(5); //设置最小连接池存在连接对象数量
+
+        \EasySwoole\ORM\DbManager::getInstance()->addConnection(new \EasySwoole\ORM\Db\Connection($config), 'default');
     }
 
     public static function onRequest(Request $request, Response $response): bool

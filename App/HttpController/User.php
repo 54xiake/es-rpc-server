@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: yugang
+ * User: 54xiake
  * Date: 2019-10-23
  * Time: 19:25
  */
@@ -22,7 +22,7 @@ class User extends Controller
     public function add() {
         try {
             $user = new UserModel();
-            $data = ['name'=>'yugang', 'sex'=>1];
+            $data = ['name'=>'54xiake', 'sex'=>1];
             $result = $user->add($data);
             $this->response()->write(json_encode($result));
         } catch (\Exception $e) {
