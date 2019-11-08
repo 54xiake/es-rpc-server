@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: yugang
+ * User: 54xiake
  * Date: 2019-11-06
  * Time: 16:45
  */
@@ -14,8 +14,6 @@ use EasySwoole\Http\AbstractInterface\Controller;
 
 class Log extends Controller
 {
-
-
     function index()
     {
         Logger::getInstance()->log('=========aaaa', Logger::LOG_LEVEL_ERROR);

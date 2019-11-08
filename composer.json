@@ -19,7 +19,8 @@
         "easyswoole/consul": "^1.0",
         "aliyunmq/mq-http-sdk": "^1.0",
         "easyswoole/orm": "^1.0",
-        "54xiake/php-string-tools": "^1.0.0"
+        "54xiake/php-string-tools": "^1.0.0",
+        "easyswoole/ddl": "^1.0"
     },
     "autoload": {
         "psr-4": {
