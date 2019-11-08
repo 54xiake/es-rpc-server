@@ -63,15 +63,16 @@ class EasySwooleEvent implements Event
 //        $poolConf->setMaxObjectNum(20);
 
         //redis
-//        $redisConfigData = Config::getInstance()->getConf('REDIS');
-//        $redisConfig = new \EasySwoole\RedisPool\Config($redisConfigData);
-//        // $config->setOptions(['serialize'=>true]);
-//        /**
-//        这里注册的名字叫redis，你可以注册多个，比如redis2,redis3
-//         */
-//        $poolConf = \EasySwoole\RedisPool\Redis::getInstance()->register('redis',$redisConfig);
-//        $poolConf->setMaxObjectNum($redisConfigData['maxObjectNum']);
-//        $poolConf->setMinObjectNum($redisConfigData['minObjectNum']);
+        $redisConfigData = Config::getInstance()->getConf('REDIS');
+        $redisConfig = new \EasySwoole\Redis\Config\RedisConfig($redisConfigData);
+
+        // $config->setOptions(['serialize'=>true]);
+        /**
+        这里注册的名字叫redis，你可以注册多个，比如redis2,redis3
+         */
+        $poolConf = \EasySwoole\RedisPool\Redis::getInstance()->register('redis',$redisConfig);
+        $poolConf->setMaxObjectNum($redisConfigData['maxObjectNum']);
+        $poolConf->setMinObjectNum($redisConfigData['minObjectNum']);
 
         //注册事件
         \App\Event\Event::getInstance()->set('test', function () {

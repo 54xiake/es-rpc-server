@@ -17,5 +17,9 @@ class Redis extends Controller
     function index()
     {
         // TODO: Implement index() method.
+        $redis = \EasySwoole\RedisPool\Redis::defer('redis');
+        $redis->set('key', 123);
+        $result = $redis->get('key');
+        $this->writeJson(1, $result);
     }
 }
