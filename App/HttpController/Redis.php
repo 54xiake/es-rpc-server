@@ -22,4 +22,10 @@ class Redis extends Controller
         $result = $redis->get('key');
         $this->writeJson(1, $result);
     }
+
+    function incr() {
+        $redis = \EasySwoole\RedisPool\Redis::defer('redis');
+        $result = $redis->incr('key');
+        $this->writeJson(1, $result);
+    }
 }
