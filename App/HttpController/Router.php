@@ -51,6 +51,7 @@ class Router extends AbstractRouter
 //            return false;//结束此次响应
 //        });
 //        $this->setRouterNotFoundCallBack(function (Request $request,Response $response){
+//            $response->withHeader('content-type','text/html; charset=utf-8');
 //            $response->write('未找到路由匹配');
 //            return 'index';//重定向到index路由
 //        });
