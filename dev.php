@@ -31,7 +31,7 @@
     'RUN_MODEL' => 2,
     'SETTING' => 
     array (
-      'worker_num' => 8,
+      'worker_num' => 4,
       'reload_async' => true,
       'max_wait_time' => 3,
     ),
@@ -44,5 +44,5 @@
   ),
   'SERVER_NAME' => 'EasySwoole',
   'TEMP_DIR' => NULL,
-  'LOG_DIR' => NULL,
+  'LOG_DIR' => RUNNING_ROOT.'/Log/',
 );

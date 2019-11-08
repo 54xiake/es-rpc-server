@@ -85,13 +85,31 @@ class EasySwooleEvent implements Event
         $swooleServer = ServerManager::getInstance()->getSwooleServer();
         $swooleServer->addProcess((new HotReload('HotReload', ['disableInotify' => false]))->getProcess());
         //监听配置文件变更
-        $swooleServer->addProcess((new ApolloSync())->getProcess());
+        $swooleServer->addProcess((new ApolloSync('Rpc.ApolloSync'))->getProcess());
+
+        $register->add($register::onStart, function (\swoole_server $server) {
+            echo 'masterPid:' . $server->master_pid. PHP_EOL;
+            //管理进程的PID，通过向管理进程发送SIGUSR1信号可实现柔性重启
+            echo 'managerPid:' . $server->manager_pid. PHP_EOL;
+
+            //修改主进程名称
+//            @swoole_set_process_name("swoole server");
+
+            print_r(swoole_get_local_mac());
+        });
 
 
         //主服务注册onWorkerStart事件
         $register->add($register::onWorkerStart,function (\swoole_server $server,int $workerId){
             var_dump($workerId.'start');
             file_put_contents('/tmp/123.log', print_r(get_included_files(),1));
+
+            //修改子进程名称
+//            @swoole_set_process_name("php-worker-{$workerId}");
+        });
+
+        $register->add($register::onReceive, function (\swoole_server $server, int $workerId) {
+
         });
 
         //主服务增加onMessage事件
@@ -314,6 +332,9 @@ class EasySwooleEvent implements Event
         $config->setMinObjectNum(5); //设置最小连接池存在连接对象数量
 
         \EasySwoole\ORM\DbManager::getInstance()->addConnection(new \EasySwoole\ORM\Db\Connection($config), 'default');
+
+        $list = ServerManager::getInstance()->getSwooleServer();
+        print_r($list);
     }
 
     public static function onRequest(Request $request, Response $response): bool
